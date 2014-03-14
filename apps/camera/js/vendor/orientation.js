@@ -100,6 +100,7 @@ define(function() {
     if ((x * x + y * y + z * z) > 110) {
       return;
     }
+
     // If the camera is close to horizontal (pointing up or down) then we can't
     // tell what orientation the user intends, so we just return now without
     // changing the orientation. The constant 9.2 is the force of gravity (9.8)
