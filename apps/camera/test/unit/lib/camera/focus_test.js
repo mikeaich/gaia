@@ -18,7 +18,11 @@ suite('lib/camera/focus', function() {
         focusModes : ["auto", "infinity", "normal",
           "macro", "continuous-picture", "continuous-video" ],
       },
-      autoFocus: sinon.stub(),
+      autoFocus: sinon.stub().returns({
+        then: function(onSuccess, onError) {
+          onSuccess(true);
+        }
+      }),
       setFocusAreas: sinon.stub(),
       setMeteringAreas: sinon.stub(),
       stopContinuousFocus: sinon.stub(),
@@ -422,7 +426,9 @@ suite('lib/camera/focus', function() {
       var onFocused = sinon.spy();
       this.mozCamera.autoFocus = sinon.stub();
       this.mozCamera.focusMode = 'auto';
-      this.mozCamera.autoFocus.callsArgWith(0, undefined);
+      this.mozCamera.autoFocus.returns(new Promise(function(resolve, reject) {
+        resolve(undefined);
+      }));
       this.focus.focus(onFocused);
       assert.ok(this.focus.onAutoFocusChanged.calledWith('focusing'));
       assert.ok(this.mozCamera.autoFocus.called);
@@ -434,7 +440,9 @@ suite('lib/camera/focus', function() {
       var onFocused = sinon.spy();
       this.mozCamera.autoFocus = sinon.stub();
       this.mozCamera.focusMode = 'auto';
-      this.mozCamera.autoFocus.callsArgWith(0, 'success');
+      this.mozCamera.autoFocus.returns(new Promise(function(resolve, reject) {
+        resolve('success');
+      }));
       this.focus.focus(onFocused);
       assert.ok(this.focus.onAutoFocusChanged.calledWith('focusing'));
       assert.ok(this.mozCamera.autoFocus.called);
@@ -461,7 +469,9 @@ suite('lib/camera/focus', function() {
     test('Should call the focus callback with interrupted state if autofocus is interrupted', function() {
       var onFocused = sinon.spy();
       this.mozCamera.autoFocus = sinon.stub();
-      this.mozCamera.autoFocus.callsArgWith(1, 'AutoFocusInterrupted');
+      this.mozCamera.autoFocus.returns(new Promise(function(resolve, reject) {
+        reject('NS_ERROR_IN_PROGRESS');
+      }));
       this.mozCamera.focusMode = 'auto';
       this.focus.focused = true;
       this.focus.focus(onFocused);
